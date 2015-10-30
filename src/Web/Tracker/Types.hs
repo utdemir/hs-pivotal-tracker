@@ -103,7 +103,7 @@ data Story = Story
   -- , sProjectedCompletion :: UTCTime
   , sRequestedById :: UserId
   , sOwnerIds      :: [UserId]
-  , sLabels        :: [Text]
+  -- , sLabels        :: [Label]
   -- , sFollowerIds   :: [UserId]
   , sCreatedAt     :: UTCTime
   , sUpdatedAt     :: UTCTime
