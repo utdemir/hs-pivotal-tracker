@@ -30,6 +30,7 @@ main = do
     "deliver" :sid:[] -> doSetState token Delivered  <$> readMaybe sid
     "accept"  :sid:[] -> doSetState token Accepted   <$> readMaybe sid
     "reject"  :sid:[] -> doSetState token Rejected   <$> readMaybe sid
+    "stateOf" :sid:[] -> doStateOf  token            <$> readMaybe sid
     _                 -> Nothing
 
   query <- maybe invalidSyntax return query
@@ -47,6 +48,9 @@ doListStories :: Maybe Text -> ProjectId -> StoryState -> EitherT ServantError I
 doListStories t i s = stories t i >>= mapM_ printStory
   where printStory Story{sId=StoryId id, sName}
           = liftIO . putStrLn $ show id <> "\t" <> T.unpack sName
+
+doStateOf :: Maybe Text -> StoryId -> EitherT ServantError IO ()
+doStateOf t i = story t i >>= liftIO . print . sCurrentState
 
 invalidSyntax :: IO a
 invalidSyntax = getProgName >>= putStrLn . msg >> exitWith (ExitFailure 1)
