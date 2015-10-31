@@ -8,7 +8,7 @@ let
       , servant-client, stdenv, text, time, transformers
       }:
       mkDerivation {
-        pname = "tracker";
+        pname = "pivotal-tracker";
         version = "0.1.0.0";
         src = ./.;
         isLibrary = true;
