@@ -1,6 +1,6 @@
 { mkDerivation, aeson, aeson-casing, base, either, servant
 , servant-client, stdenv, text, time, transformers
-w}:
+}:
 mkDerivation {
   pname = "pivotal-tracker";
   version = "0.1.0.0";
