@@ -35,7 +35,7 @@ library
 
 executable tracker
   main-is: src/Main.hs
-  build-depends:      base >=4.8 && <4.9
+  build-depends:      base >=4.6 && <4.9
                     , pivotal-tracker
                     , servant
                     , text
