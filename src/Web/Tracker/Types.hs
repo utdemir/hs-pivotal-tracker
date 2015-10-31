@@ -37,6 +37,9 @@ data ProjectId
 instance FromJSON ProjectId where
   parseJSON = fmap ProjectId . parseJSON
 
+instance Read ProjectId where
+  readPrec = fmap ProjectId readPrec
+
 instance ToText ProjectId where
   toText (ProjectId t) = toText t
 
@@ -50,7 +53,7 @@ instance FromJSON UserId where
 data StoryState
   = Accepted | Delivered | Finished | Started
   | Rejected | Planned | Unstarted | Unscheduled
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Enum, Bounded)
 
 instance FromJSON StoryState where
   parseJSON "accepted"    = return Accepted
@@ -63,15 +66,17 @@ instance FromJSON StoryState where
   parseJSON "unscheduled" = return Unscheduled
 
 instance ToJSON StoryState where
-  toJSON Accepted    = "accepted"
-  toJSON Delivered   = "delivered"
-  toJSON Finished    = "finished"
-  toJSON Started     = "started"
-  toJSON Rejected    = "rejected"
-  toJSON Planned     = "planned"
-  toJSON Unstarted   = "unstarted"
-  toJSON Unscheduled = "unscheduled"
+  toJSON = toJSON . toText
 
+instance ToText StoryState where
+  toText Accepted    = "accepted"
+  toText Delivered   = "delivered"
+  toText Finished    = "finished"
+  toText Started     = "started"
+  toText Rejected    = "rejected"
+  toText Planned     = "planned"
+  toText Unstarted   = "unstarted"
+  toText Unscheduled = "unscheduled"
 
 data StoryType
   = Feature | Bug | Chore | Release

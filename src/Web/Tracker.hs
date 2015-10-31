@@ -35,6 +35,7 @@ type API = "services" :> "v5" :> "stories"
              :> Header "X-TrackerToken" Text
              :> Capture ":projectId" ProjectId
              :> "stories"
+             :> QueryParam "with_state" StoryState
              :> Get '[JSON] [Story]
 
 api :: Proxy API
