@@ -1,11 +1,9 @@
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
 module Web.Tracker
-  ( module Web.Tracker.Types
-  , story
+  ( story
   , updateStory
   , stories
 
@@ -19,7 +17,7 @@ import           Data.Text         (Text)
 import           Servant.API
 import           Servant.Client
 --------------------------------------------------------------------------------
-import           Web.Tracker.Types
+import           Web.Tracker.Story
 --------------------------------------------------------------------------------
 
 type API = "services" :> "v5" :> "stories"

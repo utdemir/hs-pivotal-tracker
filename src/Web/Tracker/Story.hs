@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
 
-module Web.Tracker.Types where
+module Web.Tracker.Story where
 
 --------------------------------------------------------------------------------
 import           Data.Aeson

@@ -1,6 +1,5 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NamedFieldPuns    #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
@@ -19,6 +18,7 @@ import           System.Exit
 import           Text.Read                  (readMaybe)
 --------------------------------------------------------------------------------
 import           Web.Tracker
+import           Web.Tracker.Story
 --------------------------------------------------------------------------------
 
 main :: IO ()
