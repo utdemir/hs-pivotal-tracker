@@ -6,6 +6,7 @@ module Web.Tracker
   ( story
   , updateStory
   , stories
+  , project
 
   -- Re-exports
   , ServantError
@@ -18,6 +19,7 @@ import           Servant.API
 import           Servant.Client
 --------------------------------------------------------------------------------
 import           Web.Tracker.Story
+import           Web.Tracker.Project
 --------------------------------------------------------------------------------
 
 type API = "services" :> "v5" :> "stories"
@@ -35,8 +37,12 @@ type API = "services" :> "v5" :> "stories"
              :> "stories"
              :> QueryParam "with_state" StoryState
              :> Get '[JSON] [Story]
+      :<|> "services" :> "v5" :> "projects"
+             :> Header "X-TrackerToken" Text
+             :> Capture ":projectId" ProjectId
+             :> Get '[JSON] Project
 
 api :: Proxy API
 api = Proxy
 
-story :<|> updateStory :<|> stories = client api (BaseUrl Https "www.pivotaltracker.com" 443)
+story :<|> updateStory :<|> stories :<|> project = client api (BaseUrl Https "www.pivotaltracker.com" 443)
