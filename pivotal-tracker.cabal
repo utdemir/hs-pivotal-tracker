@@ -22,7 +22,7 @@ source-repository head
 library
   exposed-modules:   Web.Tracker
                    , Web.Tracker.Story
-  -- other-modules:     Web.Tracker.Types
+                   , Web.Tracker.Project
   build-depends:       base >=4.6 && <4.9
                      , servant
                      , servant-client

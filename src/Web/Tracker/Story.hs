@@ -5,9 +5,7 @@ module Web.Tracker.Story where
 --------------------------------------------------------------------------------
 import           Data.Aeson
 import           Data.Aeson.Casing
-import           Data.String
 import           Data.Text         (Text)
-import qualified Data.Text         as T
 import           Data.Time.Clock
 import           GHC.Generics
 import           Servant.API
