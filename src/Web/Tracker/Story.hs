@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Web.Tracker.Story where
 
@@ -26,8 +28,8 @@ instance Read StoryId where
 instance ToJSON StoryId where
   toJSON (StoryId t) = toJSON t
 
-instance ToText StoryId where
-  toText (StoryId t) = toText t
+instance ToHttpApiData StoryId where
+  toUrlPiece (StoryId t) = toUrlPiece t
 
 data ProjectId
   = ProjectId Int
@@ -39,8 +41,8 @@ instance FromJSON ProjectId where
 instance Read ProjectId where
   readPrec = fmap ProjectId readPrec
 
-instance ToText ProjectId where
-  toText (ProjectId t) = toText t
+instance ToHttpApiData ProjectId where
+  toUrlPiece (ProjectId t) = toUrlPiece t
 
 data UserId
   = UserId Int
@@ -55,37 +57,42 @@ data StoryState
   deriving (Show, Eq, Ord, Enum, Bounded)
 
 instance FromJSON StoryState where
-  parseJSON "accepted"    = return Accepted
-  parseJSON "delivered"   = return Delivered
-  parseJSON "finished"    = return Finished
-  parseJSON "started"     = return Started
-  parseJSON "rejected"    = return Rejected
-  parseJSON "planned"     = return Planned
-  parseJSON "unstarted"   = return Unstarted
-  parseJSON "unscheduled" = return Unscheduled
+  parseJSON = withText "StoryState" $ \case
+   "accepted"    -> return Accepted
+   "delivered"   -> return Delivered
+   "finished"    -> return Finished
+   "started"     -> return Started
+   "rejected"    -> return Rejected
+   "planned"     -> return Planned
+   "unstarted"   -> return Unstarted
+   "unscheduled" -> return Unscheduled
+   other -> fail $ "Invalid story state: " ++ T.unpack other
 
 instance ToJSON StoryState where
-  toJSON = toJSON . toText
+  toJSON = toJSON . toUrlPiece
 
-instance ToText StoryState where
-  toText Accepted    = "accepted"
-  toText Delivered   = "delivered"
-  toText Finished    = "finished"
-  toText Started     = "started"
-  toText Rejected    = "rejected"
-  toText Planned     = "planned"
-  toText Unstarted   = "unstarted"
-  toText Unscheduled = "unscheduled"
+instance ToHttpApiData StoryState where
+  toUrlPiece = \case
+    Accepted    -> "accepted"
+    Delivered   -> "delivered"
+    Finished    -> "finished"
+    Started     -> "started"
+    Rejected    -> "rejected"
+    Planned     -> "planned"
+    Unstarted   -> "unstarted"
+    Unscheduled -> "unscheduled"
 
 data StoryType
   = Feature | Bug | Chore | Release
   deriving (Show, Eq, Ord)
 
 instance FromJSON StoryType where
-  parseJSON "feature" = return Feature
-  parseJSON "bug"     = return Bug
-  parseJSON "chore"   = return Chore
-  parseJSON "release" = return Release
+  parseJSON = withText "StoryType" $ \case
+   "feature" -> return Feature
+   "bug"     -> return Bug
+   "chore"   -> return Chore
+   "release" -> return Release
+   other -> fail $ "Invalid StoryType: " ++ T.unpack other
 
 data UpdateStory
   = SetStoryState StoryState

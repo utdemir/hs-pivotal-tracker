@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                pivotal-tracker
-version:             0.1.0.1
+version:             0.2.0.0
 synopsis:            A library and a CLI tool for accessing Pivotal Tracker API
 -- description:         
 license:             BSD3
@@ -23,10 +23,13 @@ library
   exposed-modules:   Web.Tracker
                    , Web.Tracker.Story
   -- other-modules:     Web.Tracker.Types
-  build-depends:       base >=4.6 && <4.9
+  build-depends:       base >=4.6 && <4.11
                      , servant
                      , servant-client
                      , aeson
+                     , http-client
+                     , http-client-tls
+                     , mtl
                      , text
                      , transformers
                      , time
@@ -37,7 +40,7 @@ library
 
 executable tracker
   main-is: src/Main.hs
-  build-depends:      base >=4.6 && <4.9
+  build-depends:      base >=4.6 && <4.11
                     , pivotal-tracker
                     , servant
                     , text

@@ -7,7 +7,6 @@ module Main where
 import           Control.Applicative        ((<$>))
 import           Control.Monad
 import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Either
 import           Data.List
 import           Data.Monoid
 import           Data.Text                  (Text)
@@ -23,32 +22,32 @@ import           Web.Tracker.Story
 
 main :: IO ()
 main = do
-  token <- fmap T.pack <$> lookupEnv "TRACKER_API_TOKEN"
+  token <- T.pack <$> lookupFail "TRACKER_API_TOKEN"
+  manager <- mkManager
 
   query <- getArgs >>= return . \case
-    "unstart"        :sid:[] -> doSetState token Unstarted <$> readMaybe sid
-    "start"          :sid:[] -> doSetState token Started   <$> readMaybe sid
-    "finish"         :sid:[] -> doSetState token Finished  <$> readMaybe sid
-    "deliver"        :sid:[] -> doSetState token Delivered <$> readMaybe sid
-    "accept"         :sid:[] -> doSetState token Accepted  <$> readMaybe sid
-    "reject"         :sid:[] -> doSetState token Rejected  <$> readMaybe sid
-    "stateOf"        :sid:[] -> doStateOf  token           <$> readMaybe sid
-    "list-unstarted" :pid:[] -> doList     token Unstarted <$> readMaybe pid
-    "list-started"   :pid:[] -> doList     token Started   <$> readMaybe pid
-    "list-finished"  :pid:[] -> doList     token Finished  <$> readMaybe pid
-    "list-delivered" :pid:[] -> doList     token Delivered <$> readMaybe pid
+    "unstart"        :sid:[] -> doSetState Unstarted <$> readMaybe sid
+    "start"          :sid:[] -> doSetState Started   <$> readMaybe sid
+    "finish"         :sid:[] -> doSetState Finished  <$> readMaybe sid
+    "deliver"        :sid:[] -> doSetState Delivered <$> readMaybe sid
+    "accept"         :sid:[] -> doSetState Accepted  <$> readMaybe sid
+    "reject"         :sid:[] -> doSetState Rejected  <$> readMaybe sid
+    "stateOf"        :sid:[] -> doStateOf            <$> readMaybe sid
+    "list-unstarted" :pid:[] -> doList     Unstarted <$> readMaybe pid
+    "list-started"   :pid:[] -> doList     Started   <$> readMaybe pid
+    "list-finished"  :pid:[] -> doList     Finished  <$> readMaybe pid
+    "list-delivered" :pid:[] -> doList     Delivered <$> readMaybe pid
     _                        -> Nothing
 
-  query <- maybe invalidSyntax return query
-
-  runEitherT query >>= \case
+  maybe invalidSyntax (runTrackerAPI token manager) query >>= \case
     Left err -> print err >> exitWith (ExitFailure 1)
     Right () -> return ()
 
-  return ()
+lookupFail :: String -> IO String
+lookupFail var = maybe (fail $ "Expected environment variable " ++ var) return =<< lookupEnv var
 
-doSetState :: Maybe Text -> StoryState -> StoryId -> EitherT ServantError IO ()
-doSetState t s i = void $ updateStory t (SetStoryState s) i
+doSetState :: StoryState -> StoryId -> TrackerAPI ()
+doSetState s i = void $ updateStory (SetStoryState s) i
 
 printStory :: MonadIO m => Story ->  m ()
 printStory Story{sId=StoryId id, sName, sStoryType, sCurrentState}
@@ -57,11 +56,11 @@ printStory Story{sId=StoryId id, sName, sStoryType, sCurrentState}
                      <> "\t" <> show sCurrentState
                      <> "\t" <> T.unpack sName
 
-doList :: Maybe Text -> StoryState -> ProjectId -> EitherT ServantError IO ()
-doList t s i = stories t i (Just s) >>= mapM_ printStory . take 30
+doList :: StoryState -> ProjectId -> TrackerAPI ()
+doList s i = stories i (Just s) >>= mapM_ printStory . take 30
 
-doStateOf :: Maybe Text -> StoryId -> EitherT ServantError IO ()
-doStateOf t i = story t i >>= liftIO . print . sCurrentState
+doStateOf :: StoryId -> TrackerAPI ()
+doStateOf i = story i >>= liftIO . print . sCurrentState
 
 invalidSyntax :: IO a
 invalidSyntax = getProgName >>= putStrLn . msg >> exitWith (ExitFailure 1)
